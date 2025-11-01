@@ -2,7 +2,39 @@ from flask import Flask, jsonify, request
 import http.client, json, requests, traceback
 
 app = Flask(__name__)
-
+def checkroom(code):
+  url = "https://wayground.com/play-api/v5/checkRoom"
+  payload = {
+    "roomCode": code
+  }
+  headers = {
+    'User-Agent': "Mozilla/5.0 (Linux; Android 11; RMX3269 Build/RP1A.201005.001) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.98 Mobile Safari/537.36",
+    'Accept': "application/json",
+    'Accept-Encoding': "gzip, deflate, br, zstd",
+    'Content-Type': "application/json",
+    'credentials': "include",
+    'sec-ch-ua-platform': "\"Android\"",
+    'experiment-name': "main_main",
+    'sec-ch-ua': "\"Android WebView\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+    'sec-ch-ua-mobile': "?1",
+    'origin': "https://wayground.com",
+    'x-requested-with': "mark.via.gp",
+    'sec-fetch-site': "same-origin",
+    'sec-fetch-mode': "cors",
+    'sec-fetch-dest': "empty",
+    'accept-language': "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
+    'priority': "u=1, i",
+    }
+  response = requests.post(url, json=payload, headers=headers)
+  
+  try:
+    r = response.json()
+    if '"success":false' in response.text:
+      return{"status": "error", "msg": "Room not found"}
+    else:
+      return{"status": "success", "msg": r["room"]["hash"]}
+  except Exception as e:
+    return{"status":"error", "msg": e}
 @app.route('/')
 def home():
     return jsonify({"status": "ok", "message": "✅ Quizizz Flask API running on Vercel!"})
@@ -16,10 +48,16 @@ def quizizz():
       return jsonify({"error": "Thiếu Dữ Liệu Room & Playid"}), 500
     try:
         # --- Gọi Wayground API ---
+        roomhash = checkroom(room)
+        if roomhash["status"] == "error":
+          return jsonify({"error": roomhash["msg"]}), 500
+        else:
+          roomhashcode = roomhash["msg"]
+        
         conn = http.client.HTTPSConnection("wayground.com")
 
         payload = json.dumps({
-            "roomHash": room,
+            "roomHash": roomhashcode,
             "playerId": playid,
             "startSource": "reconnectRejoin",
             "powerupInternalVersion": "20",
