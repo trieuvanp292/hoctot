@@ -12,7 +12,7 @@ def home():
 def quizizz():
     playid = request.args.get('playid')
     room = request.args.get('room')
-    if room is None and playerid is None:
+    if room is None and playid is None:
       return jsonify({"error": "Thiếu Dữ Liệu Room & Playid"}), 500
     try:
         # --- Gọi Wayground API ---
