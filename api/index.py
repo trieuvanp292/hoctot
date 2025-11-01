@@ -10,15 +10,17 @@ def home():
 
 @app.route('/api/quizizz', methods=['GET'])
 def quizizz():
-    payid = request.args.get('payid')
+    playid = request.args.get('playid')
     room = request.args.get('room')
+    if room is None and playerid is None:
+      return jsonify({"error": "Thiếu Dữ Liệu Room & Playid"}), 500
     try:
         # --- Gọi Wayground API ---
         conn = http.client.HTTPSConnection("wayground.com")
 
         payload = json.dumps({
             "roomHash": room,
-            "playerId": payid,
+            "playerId": playid,
             "startSource": "reconnectRejoin",
             "powerupInternalVersion": "20",
             "type": "live",
