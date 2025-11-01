@@ -70,7 +70,7 @@ def quizizz():
         # --- Gọi Wayground API ---
         roomhash = checkroom(room)
         if roomhash["status"] == "error":
-          return jsonify({"error": roomhash["msg"]}), 500
+          return jsonify({"error": roomhash["msg"]})
         else:
           roomhashcode = roomhash["msg"]
         
@@ -108,9 +108,9 @@ def quizizz():
         data = res.read()
         x = json.loads(data.decode("utf-8"))
         if 'Player not found' in data.decode("utf-8"):
-          return jsonify({"error": f"Không Tìm Thấy Player: {playid} Trong Phòng Vui Lòng Vào Phòng Rồi Nhập Tên Nickname Vào!"}), 500
+          return jsonify({"error": f"Không Tìm Thấy Player: {playid} Trong Phòng Vui Lòng Vào Phòng Rồi Nhập Tên Nickname Vào!"})
         if 'Player not found in game' in data.decode("utf-8"):
-          return jsonify({"error": f"Không Tìm Thấy Player: {playid} Trong Phòng Vui Lòng Vào Phòng Rồi Nhập Tên Nickname Vào!"}), 500
+          return jsonify({"error": f"Không Tìm Thấy Player: {playid} Trong Phòng Vui Lòng Vào Phòng Rồi Nhập Tên Nickname Vào!"})
         # --- Xử lý danh sách câu hỏi ---
         questions = x["room"]["questions"]
         all_data = []
@@ -142,7 +142,7 @@ Dữ liệu:
         response = requests.post(URL, json=payload_ai)
 
         if response.status_code != 200:
-            return jsonify({"error": "AI request failed", "detail": response.text}), 500
+            return jsonify({"error": "AI request failed", "detail": response.text})
 
         ai_data = response.json()
         result = ai_data["candidates"][0]["content"]["parts"][0]["text"]
@@ -154,7 +154,7 @@ Dữ liệu:
 
     except Exception as e:
         print("❌ ERROR:", traceback.format_exc())
-        return jsonify({data.decode("utf-8"): str(e)}), 500
+        return jsonify({data.decode("utf-8"): str(e)})
 
 
 if __name__ == "__main__":
