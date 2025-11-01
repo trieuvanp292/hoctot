@@ -87,6 +87,8 @@ def quizizz():
         res = conn.getresponse()
         data = res.read()
         x = json.loads(data.decode("utf-8"))
+        if 'Player not found' in data.decode("utf-8"):
+          return jsonify({"error": f"Không Tìm Thấy Player: {playid} Trong Phòng Vui Lòng Vào Phòng Rồi Nhập Tên Nickname Vào!"}), 500
         if 'Player not found in game' in data.decode("utf-8"):
           return jsonify({"error": f"Không Tìm Thấy Player: {playid} Trong Phòng Vui Lòng Vào Phòng Rồi Nhập Tên Nickname Vào!"}), 500
         # --- Xử lý danh sách câu hỏi ---
