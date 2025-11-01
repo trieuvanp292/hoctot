@@ -1,7 +1,27 @@
 from flask import Flask, jsonify, request
 import http.client, json, requests, traceback
-
+import re
 app = Flask(__name__)
+def clean(text: str) -> str:
+    """
+    Giải mã các ký tự Unicode escape như \u003C -> <, \u003E -> >
+    và xoá toàn bộ thẻ HTML khỏi chuỗi.
+    """
+    if not isinstance(text, str):
+        return text
+
+    # Bước 1: chuyển các escape Unicode HTML sang ký tự thật
+    text = (
+        text.replace("\\u003C", "<")
+            .replace("\\u003E", ">")
+            .replace("\\u002F", "/")  # trường hợp \/ cũng gặp
+    )
+
+    # Bước 2: xoá toàn bộ thẻ HTML
+    clean_text = re.sub(r'<[^>]+>', '', text)
+
+    # Bước 3: xoá khoảng trắng thừa
+    return clean_text.strip()
 def checkroom(code):
   url = "https://wayground.com/play-api/v5/checkRoom"
   payload = {
@@ -127,7 +147,8 @@ Dữ liệu:
         ai_data = response.json()
         result = ai_data["candidates"][0]["content"]["parts"][0]["text"]
         result = result.replace("```json", "").replace("```", "")
-        json_result = json.loads(result)
+        xoahtml = clean(result)
+        json_result = json.loads(xoahtml)
 
         return jsonify(json_result)
 
